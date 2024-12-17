@@ -14,8 +14,9 @@ namespace BackendAPI.Entities {
         public required string Title { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }
+        public required DateTime LastActivityTime { get; set; }
         public required Guid UserId { get; set; }
-        public User? User { get; set; }
+        public required User User { get; set; }
     }
 
     public class PostTableConfig : IEntityTypeConfiguration<Post> {
@@ -35,7 +36,9 @@ namespace BackendAPI.Entities {
         public required string Title { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }
+        public required DateTime LastActivityTime { get; set; }
         public required Guid UserId { get; set; }
+        public required UserDTO User { get; set; }
 
         public static PostDTO FromEntity(Post post) {
             return new PostDTO {
@@ -43,7 +46,9 @@ namespace BackendAPI.Entities {
                 Title = post.Title,
                 Status = post.Status,
                 CreatedTime = post.CreatedTime,
+                LastActivityTime = post.LastActivityTime,
                 UserId = post.UserId,
+                User = UserDTO.FromEntity(post.User)
             };
         }
     }
@@ -60,31 +65,34 @@ namespace BackendAPI.Entities {
         public required string Comment { get; set; }
     }
 
+    // Thông tin chi tiết của một Post, có cả danh sách các Comment, có thể sử dụng với phân trang
     public class PostResponse {
         public required Guid Id { get; set; }
         public required string Title { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }
+        public required DateTime LastActivityTime { get; set; }
         public required UserBasicInfoResponse User { get; set; }
-        public required List<CommentResponse> Comments { get; set; }
-        public required Links _links { get; set; }
+        public required PostLinks _links { get; set; }
 
-        public class Links {
+        public class PostLinks {
             public required string Self { get; set; }
+            public required string Comments { get; set; }
         }
-    }
 
-    // Thông tin cơ bản của một Post, thường dùng khi hiển thị danh sách các Post
-    public class PostBasicInfoResponse {
-        public required Guid Id { get; set; }
-        public required string Title { get; set; }
-        public required string Status { get; set; }
-        public required DateTime CreatedTime { get; set; }
-        public required UserBasicInfoResponse User { get; set; }
-        public required Links _links { get; set; }
-
-        public class Links {
-            public required string Self { get; set; }
+        public static PostResponse FromDTO(PostDTO postDTO, string apiBaseURL, string imageBaseURL) {
+            return new() {
+                Id = postDTO.Id,
+                Title = postDTO.Title,
+                Status = postDTO.Status,
+                CreatedTime = postDTO.CreatedTime,
+                LastActivityTime = postDTO.LastActivityTime,
+                User = UserBasicInfoResponse.FromDTO(postDTO.User, apiBaseURL, imageBaseURL),
+                _links = new() {
+                    Self = $"{apiBaseURL}/posts/{postDTO.Id}",
+                    Comments = $"{apiBaseURL}/posts/{postDTO.Id}/comments"
+                }
+            };
         }
     }
 }

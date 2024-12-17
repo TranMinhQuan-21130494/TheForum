@@ -113,9 +113,9 @@ namespace BackendAPI.Entities {
         public required string Role { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }
-        public required Links _links { get; set; }
+        public required UserLinks _links { get; set; }
 
-        public class Links {
+        public class UserLinks {
             public required string Self { get; set; }
             public required string UserPosts { get; set; }
         }
@@ -145,9 +145,9 @@ namespace BackendAPI.Entities {
         public required string Name { get; set; }
         public required string AvatarImageURL { get; set; }
         public required string Role { get; set; }
-        public required Links _links { get; set; }
+        public required UserLinks2 _links { get; set; }
 
-        public class Links {
+        public class UserLinks2 {
             public required string Self { get; set; }
         }
 

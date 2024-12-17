@@ -9,7 +9,7 @@ namespace BackendAPI.Data {
         public ICollection<Post> GetList(int pageSize, int pageNumber) {
             return AppDbContext.Posts
                 .Include(post => post.User)
-                .OrderByDescending(post => post.CreatedTime)
+                .OrderByDescending(post => post.LastActivityTime)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();

@@ -17,7 +17,7 @@ namespace BackendAPI {
 
             // Add DbContext to the container
             builder.Services.AddDbContext<AppDbContext>(options => {
-                options.UseMySQL(builder.Configuration.GetConnectionString("TheForum_MySQL"));
+                options.UseMySQL(builder.Configuration.GetConnectionString("TheForum_MySQL")!);
             });
 
             // Add Repositories to the container
@@ -31,7 +31,7 @@ namespace BackendAPI {
 
             // JWT Configuration
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-            var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+            var key = Encoding.UTF8.GetBytes(jwtSettings!.Key);
 
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             builder.Services.AddAuthentication(options => {

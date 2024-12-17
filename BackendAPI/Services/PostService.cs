@@ -31,7 +31,7 @@ namespace BackendAPI.Services {
         /// </summary>
         /// <param name="id">ID của Post</param>
         /// <exception cref="EntityNotFoundException">Ném ra khi không có Post với ID đã cho.</exception>
-        public PostDTO GetOne(Guid id) {
+        public PostDTO GetOneById(Guid id) {
             Post post = PostRepository.GetOne(id);
             return PostDTO.FromEntity(post);
         }
@@ -42,7 +42,9 @@ namespace BackendAPI.Services {
                 Title = postAddDTO.Title,
                 Status = postAddDTO.Status,
                 CreatedTime = DateTime.Now,
+                LastActivityTime = DateTime.Now,
                 UserId = postAddDTO.UserId,
+                User = null
             };
             PostRepository.Add(post);
         }

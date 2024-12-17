@@ -10,8 +10,8 @@ namespace BackendAPI.Entities {
         public DateTime? UpdatedTime { get; set; }
         public required Guid PostId { get; set; }
         public required Guid UserId { get; set; }
-        public Post Post { get; set; } = null!;
-        public User User { get; set; } = null!;
+        public required Post Post { get; set; }
+        public required User User { get; set; }
     }
 
     public class CommentTableConfig : IEntityTypeConfiguration<Comment> {
