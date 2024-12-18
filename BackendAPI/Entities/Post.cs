@@ -16,7 +16,7 @@ namespace BackendAPI.Entities {
         public required DateTime CreatedTime { get; set; }
         public required DateTime LastActivityTime { get; set; }
         public required Guid UserId { get; set; }
-        public required User User { get; set; }
+        public User? User { get; set; }
     }
 
     public class PostTableConfig : IEntityTypeConfiguration<Post> {
@@ -32,12 +32,11 @@ namespace BackendAPI.Entities {
 
     // DTOs
     public class PostDTO {
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
         public required string Title { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }
         public required DateTime LastActivityTime { get; set; }
-        public required Guid UserId { get; set; }
         public required UserDTO User { get; set; }
 
         public static PostDTO FromEntity(Post post) {
@@ -47,8 +46,7 @@ namespace BackendAPI.Entities {
                 Status = post.Status,
                 CreatedTime = post.CreatedTime,
                 LastActivityTime = post.LastActivityTime,
-                UserId = post.UserId,
-                User = UserDTO.FromEntity(post.User)
+                User = UserDTO.FromEntity(post.User!)
             };
         }
     }
@@ -70,29 +68,9 @@ namespace BackendAPI.Entities {
         public required Guid Id { get; set; }
         public required string Title { get; set; }
         public required string Status { get; set; }
+        public required int CommentCount { get; set; }
         public required DateTime CreatedTime { get; set; }
         public required DateTime LastActivityTime { get; set; }
-        public required UserBasicInfoResponse User { get; set; }
-        public required PostLinks _links { get; set; }
-
-        public class PostLinks {
-            public required string Self { get; set; }
-            public required string Comments { get; set; }
-        }
-
-        public static PostResponse FromDTO(PostDTO postDTO, string apiBaseURL, string imageBaseURL) {
-            return new() {
-                Id = postDTO.Id,
-                Title = postDTO.Title,
-                Status = postDTO.Status,
-                CreatedTime = postDTO.CreatedTime,
-                LastActivityTime = postDTO.LastActivityTime,
-                User = UserBasicInfoResponse.FromDTO(postDTO.User, apiBaseURL, imageBaseURL),
-                _links = new() {
-                    Self = $"{apiBaseURL}/posts/{postDTO.Id}",
-                    Comments = $"{apiBaseURL}/posts/{postDTO.Id}/comments"
-                }
-            };
-        }
+        public required UserResponse User { get; set; }
     }
 }

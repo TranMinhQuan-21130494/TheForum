@@ -1,6 +1,4 @@
-﻿using BackendAPI.Entities;
-
-namespace BackendAPI.Services{
+﻿namespace BackendAPI.Services{
     public class ImageService {
         public string Add(IFormFile file) {
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");

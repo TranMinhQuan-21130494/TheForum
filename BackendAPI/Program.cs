@@ -23,10 +23,14 @@ namespace BackendAPI {
             // Add Repositories to the container
             builder.Services.AddScoped<PostRepository>();
             builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<CommentRepository>();
+            builder.Services.AddScoped<CommentReactionRepository>();
 
             // Add Services to the container
             builder.Services.AddScoped<PostService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<CommentService>();
+            builder.Services.AddScoped<CommentReactionService>();
             builder.Services.AddScoped<ImageService>();
 
             // JWT Configuration

@@ -1,11 +1,16 @@
 ﻿using BackendAPI.Data;
 using BackendAPI.Entities;
 using BackendAPI.Exceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackendAPI.Services {
-    public class PostService(PostRepository repository) {
-        private readonly PostRepository PostRepository = repository;
+    public class PostService(
+        PostRepository repository,
+        UserService userService,
+        CommentService commentService
+        ) {
+        private readonly PostRepository _postRepository = repository;
+        private readonly UserService _userService = userService;
+        private readonly CommentService _commentService = commentService;
 
         /// <summary>
         /// Lấy danh sách các Post (có phân trang), danh sách sắp xếp thời gian mới nhất đến cũ nhất
@@ -18,7 +23,7 @@ namespace BackendAPI.Services {
                 throw new IllegalParameterException();
             }
 
-            ICollection<Post> posts = PostRepository.GetList(pageSize, pageNumber);
+            ICollection<Post> posts = _postRepository.GetList(pageSize, pageNumber);
             ICollection<PostDTO> result = [];
             foreach (Post post in posts) {
                 result.Add(PostDTO.FromEntity(post));
@@ -32,7 +37,7 @@ namespace BackendAPI.Services {
         /// <param name="id">ID của Post</param>
         /// <exception cref="EntityNotFoundException">Ném ra khi không có Post với ID đã cho.</exception>
         public PostDTO GetOneById(Guid id) {
-            Post post = PostRepository.GetOne(id);
+            Post post = _postRepository.GetOne(id);
             return PostDTO.FromEntity(post);
         }
 
@@ -44,9 +49,39 @@ namespace BackendAPI.Services {
                 CreatedTime = DateTime.Now,
                 LastActivityTime = DateTime.Now,
                 UserId = postAddDTO.UserId,
-                User = null
             };
-            PostRepository.Add(post);
+            _postRepository.Add(post);
+        }
+
+        public void Add(PostAddDTO postAddDTO, CommentAddDTO commentAddDTO) {
+            Post post = new() {
+                Id = Guid.NewGuid(),
+                Title = postAddDTO.Title,
+                Status = postAddDTO.Status,
+                CreatedTime = DateTime.Now,
+                LastActivityTime = DateTime.Now,
+                UserId = postAddDTO.UserId,
+            };
+            Comment comment = new() {
+                Id = Guid.NewGuid(),
+                Content = commentAddDTO.Content,
+                CreatedTime = DateTime.Now,
+                PostId = post.Id,
+                UserId = post.UserId,
+            };
+            _postRepository.Add(post, comment);
+        }
+
+        public PostResponse ToPostResponse(PostDTO postDTO) {
+            return new() {
+                Id = postDTO.Id,
+                Title = postDTO.Title,
+                Status = postDTO.Status,
+                CommentCount = _commentService.CountCommentByPostId(postDTO.Id),
+                CreatedTime = postDTO.CreatedTime,
+                LastActivityTime = postDTO.LastActivityTime,
+                User = _userService.ToUserResponse(postDTO.User)
+            };
         }
     }
 }

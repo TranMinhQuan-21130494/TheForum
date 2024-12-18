@@ -113,55 +113,5 @@ namespace BackendAPI.Entities {
         public required string Role { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }
-        public required UserLinks _links { get; set; }
-
-        public class UserLinks {
-            public required string Self { get; set; }
-            public required string UserPosts { get; set; }
-        }
-
-        public static UserResponse FromDTO(UserDTO userDTO, string apiBaseURL, string imageBaseURL) {
-            string avatarImageName = userDTO.AvatarImageName ?? "defaultAvatar.jpg";
-            return new() {
-                Id = userDTO.Id,
-                Name = userDTO.Name,
-                AvatarImageURL = $"{imageBaseURL}/{avatarImageName}",
-                Role = userDTO.Role,
-                Status = userDTO.Status,
-                CreatedTime = userDTO.CreatedTime,
-                _links = new() {
-                    Self = $"{apiBaseURL}/users/{userDTO.Id}",
-                    UserPosts = $"{apiBaseURL}/users/{userDTO.Id}/posts"
-                }
-            };
-        }
-    }
-
-    // Thông tin cơ bản của User kèm theo link đến thông tin chi tiết
-    // Nên dùng class này khi muốn lấy thông tin user từ các nguồn khác, nơi mà User không phải là đối tượng chính
-    // Ví dụ Post, Comment, danh sách các user trong trang admin, ...
-    public class UserBasicInfoResponse {
-        public required Guid Id { get; set; }
-        public required string Name { get; set; }
-        public required string AvatarImageURL { get; set; }
-        public required string Role { get; set; }
-        public required UserLinks2 _links { get; set; }
-
-        public class UserLinks2 {
-            public required string Self { get; set; }
-        }
-
-        public static UserBasicInfoResponse FromDTO(UserDTO userDTO, string apiBaseURL, string imageBaseURL) {
-            string avatarImageName = userDTO.AvatarImageName ?? "defaultAvatar.jpg";
-            return new() {
-                Id = userDTO.Id,
-                Name = userDTO.Name,
-                AvatarImageURL = $"{imageBaseURL}/{avatarImageName}",
-                Role = userDTO.Role,
-                _links = new() {
-                    Self = $"{apiBaseURL}/users/{userDTO.Id}",
-                },
-            };
-        }
     }
 }

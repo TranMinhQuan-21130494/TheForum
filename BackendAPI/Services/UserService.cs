@@ -4,23 +4,28 @@ using BackendAPI.Exceptions;
 using BackendAPI.Utils;
 
 namespace BackendAPI.Services {
-    public class UserService(UserRepository repository, ImageService imageService) {
-        private readonly UserRepository UserRepository = repository;
-        private readonly ImageService ImageService = imageService;
+    public class UserService(
+        UserRepository repository, 
+        ImageService imageService,
+        IConfiguration configuration
+        ) {
+        private readonly UserRepository _userRepository = repository;
+        private readonly ImageService _imageService = imageService;
+        private readonly string _imageBaseURL = configuration["URL:ImageBaseURL"]!;
 
         public UserDTO GetOneById(Guid id) {
-            User user = UserRepository.GetOneById(id);
+            User user = _userRepository.GetOneById(id);
             return UserDTO.FromEntity(user);
         }
 
         public UserDTO GetOneByEmail(string email) {
-            User user = UserRepository.GetOneByEmail(email);
+            User user = _userRepository.GetOneByEmail(email);
             return UserDTO.FromEntity(user);
         }
 
         public void Add(UserAddDTO userAddDTO) {
             try {
-                User userInDatabase = UserRepository.GetOneByEmail(userAddDTO.Email);
+                User userInDatabase = _userRepository.GetOneByEmail(userAddDTO.Email);
                 // Trong trường hợp đã có email trong DB rồi thì không được phép add
                 throw new EntityUniqueCollisionException("Email existed in another user, cannot add");
             }
@@ -28,7 +33,7 @@ namespace BackendAPI.Services {
                 // Thêm ảnh vào nơi lưu trữ
                 string? imageFileName = null;
                 if(userAddDTO.AvatarImage != null) {
-                    imageFileName = ImageService.Add(userAddDTO.AvatarImage);
+                    imageFileName = _imageService.Add(userAddDTO.AvatarImage);
                 }
 
                 // Nếu chưa có User với email trùng thì được phép thêm vào
@@ -43,29 +48,42 @@ namespace BackendAPI.Services {
                     CreatedTime = DateTime.Now,
                     LastUpdatedTime = null
                 };
-                UserRepository.Add(user);
+                _userRepository.Add(user);
             }
         }
 
         public void Update(UserUpdateDTO userUpdateDTO) {
-            User user = UserRepository.GetOneById(userUpdateDTO.Id);
+            User user = _userRepository.GetOneById(userUpdateDTO.Id);
 
-            if (userUpdateDTO.AvatarImage != null) user.AvatarImageName = ImageService.Add(userUpdateDTO.AvatarImage);
+            if (userUpdateDTO.AvatarImage != null) user.AvatarImageName = _imageService.Add(userUpdateDTO.AvatarImage);
             if (userUpdateDTO.Name != null) user.Name = userUpdateDTO.Name;
             if (userUpdateDTO.RawPassword != null) user.HashedPassword = HashUtil.Hash(userUpdateDTO.RawPassword);
             if (userUpdateDTO.Status != null) user.Status = userUpdateDTO.Status;
             if (userUpdateDTO.Role != null) user.Role = userUpdateDTO.Role;
 
             user.LastUpdatedTime = DateTime.Now;
-            UserRepository.Update(user);
+            _userRepository.Update(user);
         }
 
         public UserDTO GetOneUsingAuthentication(UserAuthenticationDTO userAuthenticationDTO) {
-            User user = UserRepository.GetOneByEmail(userAuthenticationDTO.Email);
+            User user = _userRepository.GetOneByEmail(userAuthenticationDTO.Email);
             if(!HashUtil.Verify(userAuthenticationDTO.RawPassword, user.HashedPassword)) {
                 throw new UnauthorizedException();
             }
             return UserDTO.FromEntity(user);
+        }
+
+        // Response generator
+        public UserResponse ToUserResponse(UserDTO userDTO) {
+            string avatarImageName = userDTO.AvatarImageName ?? "defaultAvatar.jpg";
+            return new() {
+                Id = userDTO.Id,
+                Name = userDTO.Name,
+                AvatarImageURL = $"{_imageBaseURL}/{avatarImageName}",
+                Role = userDTO.Role,
+                Status = userDTO.Status,
+                CreatedTime = userDTO.CreatedTime
+            };
         }
     }
 }

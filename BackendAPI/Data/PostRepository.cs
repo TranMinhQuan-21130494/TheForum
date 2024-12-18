@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BackendAPI.Data {
     public class PostRepository(AppDbContext appDbContext) {
-        private readonly AppDbContext AppDbContext = appDbContext;
+        private readonly AppDbContext _appDbContext = appDbContext;
 
         public ICollection<Post> GetList(int pageSize, int pageNumber) {
-            return AppDbContext.Posts
+            return _appDbContext.Posts
                 .Include(post => post.User)
                 .OrderByDescending(post => post.LastActivityTime)
                 .Skip((pageNumber - 1) * pageSize)
@@ -16,15 +16,21 @@ namespace BackendAPI.Data {
         }
 
         public Post GetOne(Guid id) {
-            Post? post = AppDbContext.Posts
+            Post? post = _appDbContext.Posts
                 .Include(post => post.User)
                 .SingleOrDefault(post => post.Id == id);
             return post ?? throw new EntityNotFoundException();
         }
 
         public void Add(Post post) {
-            AppDbContext.Posts.Add(post);
-            AppDbContext.SaveChanges();
+            _appDbContext.Posts.Add(post);
+            _appDbContext.SaveChanges();
+        }
+
+        public void Add(Post post, Comment comment) {
+            _appDbContext.Posts.Add(post);
+            _appDbContext.Comments.Add(comment);
+            _appDbContext.SaveChanges();
         }
     }
 }

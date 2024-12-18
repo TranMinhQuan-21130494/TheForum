@@ -9,17 +9,15 @@ using System.Security.Claims;
 namespace BackendAPI.Controllers {
     [Route("api/users")]
     [ApiController]
-    public class UserController(UserService userService, IConfiguration configuration) : ControllerBase {
+    public class UserController(UserService userService) : ControllerBase {
         private readonly UserService _userService = userService;
-        private readonly string _apiBaseURL = configuration["URL:APIBaseURL"]!;
-        private readonly string _imageBaseURL = configuration["URL:ImageBaseURL"]!;
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<UserResponse> GetUser(Guid id) {
             try {
-                return Ok(UserResponse.FromDTO(_userService.GetOneById(id), _apiBaseURL, _imageBaseURL));
+                return Ok(_userService.ToUserResponse(_userService.GetOneById(id)));
             }
             catch (EntityNotFoundException) {
                 return NotFound();
@@ -52,10 +50,10 @@ namespace BackendAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<UserDTO> GetCurrentUser() {
+        public ActionResult<UserResponse> GetCurrentUser() {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             try {
-                return Ok(UserResponse.FromDTO(_userService.GetOneById(userId), _apiBaseURL, _imageBaseURL));
+                return Ok(_userService.ToUserResponse(_userService.GetOneById(userId)));
             }
             catch (EntityNotFoundException) {
                 return NotFound();

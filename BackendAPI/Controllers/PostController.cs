@@ -10,17 +10,16 @@ namespace BackendAPI.Controllers
 {
     [Route("api/posts")]
     [ApiController]
-    public class PostController(PostService postService, IConfiguration configuration) : ControllerBase {
+    public class PostController(PostService postService, CommentService commentService) : ControllerBase {
         private readonly PostService _postService = postService;
-        private readonly string _apiBaseURL = configuration["URL:APIBaseURL"]!;
-        private readonly string _imageBaseURL = configuration["URL:ImageBaseURL"]!;
+        private readonly CommentService _commentService = commentService;
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<PostResponse> GetPost(Guid id) {
             try {
-                return Ok(PostResponse.FromDTO(_postService.GetOneById(id), _apiBaseURL, _imageBaseURL));
+                return Ok(_postService.ToPostResponse(_postService.GetOneById(id)));
             }
             catch (EntityNotFoundException) {
                 return NotFound();
@@ -39,8 +38,13 @@ namespace BackendAPI.Controllers
                 Status = PostEnum.STATUS_PUBLISHED,
                 UserId = userId
             };
+            CommentAddDTO commentAddDTO = new() {
+                Content = request.Comment,
+                UserId = userId,
+                PostId = Guid.Empty,
+            };
 
-            _postService.Add(postAddDTO);
+            _postService.Add(postAddDTO, commentAddDTO);
             return Ok();
         }
 
@@ -51,7 +55,7 @@ namespace BackendAPI.Controllers
             try {
                 ICollection<PostDTO> posts = _postService.GetList(pageSize, pageNumber);
                 ICollection<PostResponse> postResponses = 
-                    posts.Select(post => PostResponse.FromDTO(post, _apiBaseURL, _imageBaseURL)).ToList();
+                    posts.Select(post => _postService.ToPostResponse(post)).ToList();
                 return Ok(postResponses);
             }
             catch (IllegalParameterException) {
