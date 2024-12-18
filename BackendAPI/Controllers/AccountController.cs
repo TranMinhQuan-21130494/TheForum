@@ -5,22 +5,16 @@ using BackendAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace BackendAPI.Controllers {
     [ApiController]
-    [Route("api/auth")]
-    public class AuthController : ControllerBase {
-        private readonly JwtSettings _jwtSettings;
-        private readonly UserService _userService;
-
-        public AuthController(IOptions<JwtSettings> jwtSettings, UserService userService) {
-            _jwtSettings = jwtSettings.Value;
-            _userService = userService;
-        }
+    [Route("api/account")]
+    public class AccountController(IOptions<JwtSettings> jwtSettings, UserService userService) : ControllerBase {
+        private readonly JwtSettings _jwtSettings = jwtSettings.Value;
+        private readonly UserService _userService = userService;
 
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status200OK)]
