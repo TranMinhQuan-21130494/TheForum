@@ -11,7 +11,7 @@ namespace BackendAPI.Services {
         ) {
         private readonly UserRepository _userRepository = repository;
         private readonly ImageService _imageService = imageService;
-        private readonly string _imageBaseURL = configuration["URL:ImageBaseURL"]!;
+        private readonly string _imageBaseURI = configuration["URL:ImageBaseURI"]!;
 
         public UserDTO GetOneById(Guid id) {
             User user = _userRepository.GetOneById(id);
@@ -79,7 +79,7 @@ namespace BackendAPI.Services {
             return new() {
                 Id = userDTO.Id,
                 Name = userDTO.Name,
-                AvatarImageURL = $"{_imageBaseURL}/{avatarImageName}",
+                AvatarImageURI = $"{_imageBaseURI}/{avatarImageName}",
                 Role = userDTO.Role,
                 Status = userDTO.Status,
                 CreatedTime = userDTO.CreatedTime

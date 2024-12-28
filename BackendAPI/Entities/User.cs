@@ -115,7 +115,7 @@ namespace BackendAPI.Entities {
     public class UserResponse {
         public required Guid Id { get; set; }
         public required string Name { get; set; }
-        public required string AvatarImageURL { get; set; }
+        public required string AvatarImageURI { get; set; }
         public required string Role { get; set; }
         public required string Status { get; set; }
         public required DateTime CreatedTime { get; set; }

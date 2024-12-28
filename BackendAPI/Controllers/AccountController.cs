@@ -16,6 +16,13 @@ namespace BackendAPI.Controllers {
         private readonly JwtSettings _jwtSettings = jwtSettings.Value;
         private readonly UserService _userService = userService;
 
+        [HttpGet("ping")]
+        public IActionResult Ping() {
+            return Ok(new {
+                Message = "OK"
+            });
+        }
+
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
