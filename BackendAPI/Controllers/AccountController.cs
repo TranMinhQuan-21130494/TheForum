@@ -39,6 +39,7 @@ namespace BackendAPI.Controllers {
                 var claims = new[] {
                     new Claim(JwtRegisteredClaimNames.Sub, userDTO.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("role", userDTO.Role)
                 };
 
                 // Generate signing key

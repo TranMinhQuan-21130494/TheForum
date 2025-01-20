@@ -18,12 +18,12 @@ namespace BackendAPI.Services {
         /// <param name="pageSize">Số lượng bản ghi trong một trang</param>
         /// <param name="pageNumber">Vị trí trang, bắt đầu từ 1</param>
         /// <exception cref="IllegalParameterException">Ném ra khi pageSize hoặc pageNumber nhỏ hơn hoặc bằng 0</exception>
-        public ICollection<PostDTO> GetList(int pageSize, int pageNumber) {
+        public ICollection<PostDTO> GetList(string category, int pageSize, int pageNumber) {
             if (pageNumber <= 0 || pageSize <= 0) {
                 throw new IllegalParameterException();
             }
 
-            ICollection<Post> posts = _postRepository.GetList(pageSize, pageNumber);
+            ICollection<Post> posts = _postRepository.GetList(category, pageSize, pageNumber);
             ICollection<PostDTO> result = [];
             foreach (Post post in posts) {
                 result.Add(PostDTO.FromEntity(post));
@@ -41,10 +41,20 @@ namespace BackendAPI.Services {
             return PostDTO.FromEntity(post);
         }
 
+        public ICollection<PostDTO> GetPostsByUserId(Guid userId) {
+            ICollection<Post> posts = _postRepository.GetPostsByUserId(userId);
+            ICollection<PostDTO> result = [];
+            foreach (Post post in posts) {
+                result.Add(PostDTO.FromEntity(post));
+            }
+            return result;
+        }
+
         public void Add(PostAddDTO postAddDTO) {
             Post post = new() {
                 Id = Guid.NewGuid(),
                 Title = postAddDTO.Title,
+                Category = postAddDTO.Category,
                 Status = postAddDTO.Status,
                 CreatedTime = DateTime.Now,
                 LastActivityTime = DateTime.Now,
@@ -57,6 +67,7 @@ namespace BackendAPI.Services {
             Post post = new() {
                 Id = Guid.NewGuid(),
                 Title = postAddDTO.Title,
+                Category = postAddDTO.Category,
                 Status = postAddDTO.Status,
                 CreatedTime = DateTime.Now,
                 LastActivityTime = DateTime.Now,
@@ -65,6 +76,8 @@ namespace BackendAPI.Services {
             Comment comment = new() {
                 Id = Guid.NewGuid(),
                 Content = commentAddDTO.Content,
+                Status = "PUBLISHED",
+                ImageName = commentAddDTO.ImageName,
                 CreatedTime = DateTime.Now,
                 PostId = post.Id,
                 UserId = post.UserId,
@@ -76,12 +89,17 @@ namespace BackendAPI.Services {
             return new() {
                 Id = postDTO.Id,
                 Title = postDTO.Title,
+                Category = postDTO.Category,
                 Status = postDTO.Status,
                 CommentCount = _commentService.CountCommentByPostId(postDTO.Id),
                 CreatedTime = postDTO.CreatedTime,
                 LastActivityTime = postDTO.LastActivityTime,
                 User = _userService.ToUserResponse(postDTO.User)
             };
+        }
+
+        public void UpdateLastActivityTime(Guid id) {
+            _postRepository.UpdateLastActivityTime(id, DateTime.Now);
         }
     }
 }

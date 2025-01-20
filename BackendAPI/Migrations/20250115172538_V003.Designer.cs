@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241217152640_V001")]
-    partial class V001
+    [Migration("20250115172538_V003")]
+    partial class V003
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,12 +35,11 @@ namespace BackendAPI.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("ImageName")
+                        .HasColumnType("longtext");
+
                     b.Property<Guid>("PostId")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("varchar(32)");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("datetime(6)");
@@ -66,6 +65,9 @@ namespace BackendAPI.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(32)");
 
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
@@ -81,6 +83,10 @@ namespace BackendAPI.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("varchar(32)");
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime(6)");

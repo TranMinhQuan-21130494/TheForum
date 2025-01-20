@@ -6,52 +6,55 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { ToastAndroid } from "react-native";
 
-export default function LoginScreen() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loginLoading, setLoginLoading] = useState(false);
-    const doLogin = async () => {
+export default function ChangePassword() {
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [recheckPassword, setRecheckPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const doChangePassword = async () => {
         // Loading
-        setLoginLoading(true);
-    
+        setLoading(true);
+        const token = await AsyncStorage.getItem('authToken');
+
         // Tạo hàm timeout
         const timeout = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Request timeout')), 5000)
         );
-    
+
         try {
-            const requestBody = JSON.stringify({ email, password });
+            const requestBody = JSON.stringify({ oldPassword, newPassword, recheckPassword });
 
             // Gọi API với timeout
             const response = await Promise.race([
-                fetch('http://10.0.2.2:5151/api/account/token', {
+                fetch('http://10.0.2.2:5151/api/users/me/changePassword', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
                     },
                     body: requestBody,
                 }),
                 timeout,
             ]);
-    
+
             if (response.ok) {
-                const data = await response.json();
-                const token = data.token;
-                await AsyncStorage.setItem('authToken', token);
-                ToastAndroid.show("Đăng nhập thành công", 2000)
+                ToastAndroid.show("Đổi mật khẩu thành công", 2000)
                 router.replace("/")
             } else {
-                Alert.alert("Đăng nhập thất bại", "Tài khoản hoặc mật khẩu của bạn không đúng");
+                const data = await response.json();
+                console.log(data)
+                const message = data.message;
+                Alert.alert("Đổi mật khẩu thất bại", message);
             }
-        } catch (error) {    
+        } catch (error) {
             // Xử lý lỗi (timeout hoặc lỗi khác)
             Alert.alert("Lỗi", error.message);
         } finally {
             // Tắt màn hình loading
-            setLoginLoading(false);
+            setLoading(false);
         }
     };
-    
+
     return (
         <View className="flex-1 items-center bg-white">
             <Image
@@ -59,25 +62,29 @@ export default function LoginScreen() {
                 source={require('@/assets/images/react-logo.png')} />
             <Text
                 className="text-3xl my-4">
-                Đăng nhập TheForum
+                Đổi mật khẩu
             </Text>
-            <MyTextInput
-                value={email}
-                onChange={setEmail}
-                placeholder="Email..." />
             <MyPasswordInput
-                value={password}
-                onChange={setPassword}
-                placeholder="Mật khẩu..." />
+                value={oldPassword}
+                onChange={setOldPassword}
+                placeholder="Mật khẩu cũ..." />
+            <MyPasswordInput
+                value={newPassword}
+                onChange={setNewPassword}
+                placeholder="Mật khẩu mới..." />
+            <MyPasswordInput
+                value={recheckPassword}
+                onChange={setRecheckPassword}
+                placeholder="Nhập lại mật khẩu mới..." />
             <TouchableOpacity
                 className="w-11/12 px-4 py-4 my-2 bg-blue-200 items-center"
-                onPress={doLogin}>
-                <Text className="text-xl">Đăng nhập</Text>
+                onPress={doChangePassword}>
+                <Text className="text-xl">Đổi mật khẩu</Text>
             </TouchableOpacity>
             <Spinner
                 textStyle={{ color: '#fff' }}
                 cancelable={true}
-                visible={loginLoading}
+                visible={loading}
                 textContent="Đang tải" />
         </View>
     )

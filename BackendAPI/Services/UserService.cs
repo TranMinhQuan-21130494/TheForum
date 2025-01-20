@@ -73,6 +73,14 @@ namespace BackendAPI.Services {
             return UserDTO.FromEntity(user);
         }
 
+        public bool CheckPasswordById(Guid userId, string rawPassword) {
+            User user = _userRepository.GetOneById(userId);
+            if (!HashUtil.Verify(rawPassword, user.HashedPassword)) {
+                return false;
+            }
+            return true;
+        }
+
         // Response generator
         public UserResponse ToUserResponse(UserDTO userDTO) {
             string avatarImageName = userDTO.AvatarImageName ?? "defaultAvatar.jpg";

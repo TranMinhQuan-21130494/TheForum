@@ -111,6 +111,12 @@ namespace BackendAPI.Entities {
         public required string Password { get; set; }
     }
 
+    public class UserChangePasswordRequest {
+        public required string OldPassword { get; set; }
+        public required string NewPassword { get; set; }
+        public required string RecheckPassword { get; set; }
+    }
+
     // Response thông tin chi tiết của User, nên sử dụng khi xem chi tiết 1 User
     public class UserResponse {
         public required Guid Id { get; set; }

@@ -40,6 +40,7 @@ namespace BackendAPI.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Title = table.Column<string>(type: "varchar(256)", nullable: false),
+                    Category = table.Column<string>(type: "varchar(32)", nullable: false),
                     Status = table.Column<string>(type: "varchar(32)", nullable: false),
                     CreatedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastActivityTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -63,7 +64,6 @@ namespace BackendAPI.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Content = table.Column<string>(type: "varchar(2048)", nullable: false),
-                    Status = table.Column<string>(type: "varchar(32)", nullable: false),
                     CreatedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     PostId = table.Column<Guid>(type: "char(36)", nullable: false),
@@ -93,7 +93,8 @@ namespace BackendAPI.Migrations
                 {
                     CommentId = table.Column<Guid>(type: "char(36)", nullable: false),
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false),
-                    ReactionType = table.Column<string>(type: "varchar(32)", nullable: false)
+                    ReactionType = table.Column<string>(type: "varchar(32)", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {

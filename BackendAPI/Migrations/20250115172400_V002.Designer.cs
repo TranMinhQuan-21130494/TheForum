@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241218100843_V002")]
+    [Migration("20250115172400_V002")]
     partial class V002
     {
         /// <inheritdoc />
@@ -34,6 +34,9 @@ namespace BackendAPI.Migrations
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("PostId")
                         .HasColumnType("char(36)");
@@ -80,6 +83,10 @@ namespace BackendAPI.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("varchar(32)");
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime(6)");
